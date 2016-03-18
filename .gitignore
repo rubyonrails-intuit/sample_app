@@ -42,3 +42,14 @@ SampleApp::Application.config.secret_key_base = secure_token
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
+
+# Ignore database file
+/config/database.yml
+
+doc/
+*.swp
+*~
+.project
+.DS_Store
+.idea
+.secret
