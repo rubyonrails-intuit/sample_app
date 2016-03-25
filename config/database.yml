@@ -27,7 +27,8 @@ development:
 test:
   adapter: postgresql
   host: localhost
-  username: user
+  # username: user
+  username: mrbrown_mac
   database: app-test
 
 production:
