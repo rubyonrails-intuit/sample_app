@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   before_action :admin_user, only: :destroy
 
   def index
-    @users = User.paginate(page: params[:page])
+    @users = User.paginate(page: params[:page], per_page: 10)
   end
 
   def show
@@ -13,11 +13,13 @@ class UsersController < ApplicationController
   end
 
   def new
-  	@user = User.new
+  	redirect_to root_url unless !current_user
+    @user = User.new
   end
 
   def create
-  	@user = User.new(user_params)
+  	redirect_to root_url unless !current_user
+    @user = User.new(user_params)
   	if @user.save
   		sign_in @user
       flash[:success] = "Welcome to the Sample App!"
@@ -42,15 +44,22 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    User.find(params[:id]).destroy
-    flash[:success] = "User deleted."
-    redirect_to users_url
+    user = User.find(params[:id])
+
+    if current_user?(user) 
+      flash[:error] = "User is not deleted."  
+      redirect_to users_url
+    else
+      User.find(params[:id]).destroy
+      flash[:success] = "User deleted."       
+      redirect_to users_url
+    end
   end
 
   private
 
   	def user_params
-  		params.require(:user).permit(:name, :email, :password, :password_confirmation)
+  		params.require(:user).permit(:name, :email, :password, :password_confirmation, :admin)
   	end
 
     def signed_in_user

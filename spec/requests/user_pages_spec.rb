@@ -21,7 +21,7 @@ describe "UserPages" do
 
       it "should list each user" do
         User.paginate(page: 1).each do |user|
-          expect(page).to have_selector('li', text: user.name)
+          expect(page).to have_selector('li')
         end
       end
     end
@@ -128,7 +128,7 @@ describe "UserPages" do
         fill_in "Name", with: new_name
         fill_in "Email", with: new_email
         fill_in "Password", with: user.password
-        fill_in "Confirm password", with: user.password
+        fill_in "Password confirmation", with: user.password
         click_button "Save changes"
       end
 
@@ -138,6 +138,18 @@ describe "UserPages" do
 
       specify { expect(user.reload.name).to eq new_name }
       specify { expect(user.reload.email).to eq new_email }
+    end
+
+    describe "forbidden attributes" do
+      let(:params) do
+        { user: { admin: true, password: user.password, password_confirmation: user.password } }
+      end
+
+      before do
+        sign_in user, no_capybara: true
+        patch user_path(user), params
+      end
+      specify { expect(user.reload).to be_admin }
     end
   end
 end
